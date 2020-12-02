@@ -1,0 +1,90 @@
+scope: "@VERSION@-@CLUSTER@"
+namespace: /db/
+name: {{ ansible_hostname }}
+ 
+ 
+restapi:
+    listen: {{ ansible_default_ipv4['address'] }}:8008
+    connect_address: {{ ansible_default_ipv4['address'] }}:8008
+ 
+@DCS_CONFIG@
+ 
+bootstrap:
+    method: pg_createcluster
+    pg_createcluster:
+        command: /usr/share/patroni/pg_createcluster_patroni
+    dcs:
+        ttl: 30
+        loop_wait: 10
+        retry_timeout: 10
+        maximum_lag_on_failover: 1048576
+        postgresql:
+            use_pg_rewind: true
+            parameters:
+                    wal_level: replica
+                    hot_standby: "on"
+                    wal_keep_segments: 8
+                    max_wal_senders: 8
+                    max_replication_slots: 8
+                    checkpoint_timeout: 30
+                    wal_log_hints: "on"
+ 
+
+   
+    initdb:
+    - encoding: UTF8
+    - data-checksums
+ 
+    pg_hba:
+      - local   all             all                                     peer
+      - host    all             all             127.0.0.1/32            md5
+      - host    all             all             ::1/128                 md5
+      - host    all             all             @NETWORK@               md5
+      - local   replication     all                                     peer
+      - host    replication     all             127.0.0.1/32            md5
+      - host    replication     all             ::1/128                 md5
+      - host    replication     all             @NETWORK@               md5
+   
+ 
+#    users:
+#        admin:
+#            password: admin
+#            options:
+#               - createrole
+#                - createdb
+ 
+postgresql:
+    reate_replica_method:
+        - pg_clonecluster
+    pg_clonecluster:
+        command: /usr/share/patroni/pg_clonecluster_patroni
+
+    listen: "0.0.0.0:@PORT@"
+    connect_address: @HOSTIP@:@PORT@
+    data_dir: /var/lib/postgresql/@VERSION@/@CLUSTER@
+    bin_dir: /usr/lib/postgresql/@VERSION@/bin
+    config_dir: /etc/postgresql/@VERSION@/@CLUSTER@
+    pgpass: /var/lib/postgresql/@VERSION@-@CLUSTER@.pgpass
+    authentication:
+        replication:
+            username: "replicator"
+            password: "rep-pass"
+        superuser:
+            username: postgres
+            password:
+    parameters:
+        unix_socket_directories: '/var/run/postgresql/'
+        # Emulate default Debian/Ubuntu logging
+        logging_collector: 'on'
+        log_directory: '/var/log/postgresql'
+        log_filename: 'postgresql-@VERSION@-@CLUSTER@.log'
+ 
+tags:
+    nofailover: false
+    noloadbalance: false
+    clonefrom: false
+    nosync: false
+
+log:
+   dir: /var/log/patroni
+   level: INFO   

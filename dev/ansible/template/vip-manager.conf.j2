@@ -1,0 +1,25 @@
+# All keys here are mandatory
+
+VIP_IP="{{ cluster_vip }}"
+
+# Netmask for IP address
+VIP_MASK=24
+
+# Just use the normal interface name of the primary network interface
+VIP_IFACE="eth0"
+
+# This must match scope from Patroni postgres.yml
+#VIP_KEY="/service/batman/leader"
+
+# This value must match the value used in Patroni postgres.yml
+#VIP_HOST="serverX"
+
+# Specify the type of endpoint (etcd|consul)
+#VIP_TYPE="etcd"
+
+#VIP_ENDPOINT="http://10.1.2.3:2379"
+
+#not mandatory
+#VIP_HOSTINGTYPE="basic"
+#VIP_ETCD_USER
+#VIP_ETCD_PASSWORD

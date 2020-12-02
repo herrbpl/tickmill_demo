@@ -1,0 +1,50 @@
+- name: add postgresql apt key
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+  become: true
+
+- name: add postgres focal repo
+  apt_repository:
+    repo: deb http://apt.postgresql.org/pub/repos/apt focal-pgdg main
+    state: present
+  become: true
+
+- name: Install postgresql
+  apt:
+    name: postgresql-common
+    state: present
+  tags:
+    - postgres
+  
+- name: Template a file for createcluster
+  template:
+    src: template/createcluster.conf.j2
+    dest: /etc/postgresql-common/createcluster.conf
+    owner: postgres
+    group: postgres
+    mode: '0644'
+
+
+- name: Install postgresql
+  apt:
+    name: postgresql-{{ postgresql_version }}
+    state: present
+  tags:
+    - postgres
+
+- name: Create backup directory if it does not exist
+  file:
+    path: /data/backup
+    state: directory
+    mode: '0755'
+
+- name: stop service postgresql
+  service:
+    name: postgresql
+    state: stopped
+ 
+- name: disable postgresql
+  service:
+    name: postgresql
+    enabled: no

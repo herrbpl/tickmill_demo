@@ -1,0 +1,19 @@
+---
+- name: cluster
+  hosts: all
+  become: yes
+  gather_facts: True
+- import_playbook: dist-upgrade.yml
+
+- name: postgresdb
+  hosts: all
+  become : yes
+  vars_files: 
+  - vars/variables.yml
+  roles:
+    - base          #Installs required Packages
+    - postgres      #Installs Postgresql-ver (ver number per usage what needs to be changed )
+    - disk          #creates new LVM for data and backup 
+    - etcd          #creates etcd Cluster to host
+    - patroni       #installs Patroni and Dependecies with added conf etc
+    - vip-manager   # Installs and enables configuration for vip-manager

@@ -1,0 +1,28 @@
+#test inventory 10.0.34.XX network
+# recommendation: 3 or 5-7 nodes
+[patroni-prim]  
+10.0.34.90
+[patroni-sec]
+10.0.34.91
+10.0.34.92
+
+# if with_haproxy_load_balancing: true (in vars/main.yml)
+[balancers]
+10.0.34.90 keepalived_priority=102
+10.0.34.91 keepalived_priority=101
+10.0.34.92 keepalived_priority=100
+
+
+
+[postgres_cluster:children]
+patroni-prim
+patroni-sec
+# Connection settings
+[all:vars]
+ansible_connection='ssh'
+ansible_ssh_port='22'
+ansible_user='riajenk'
+#ansible_ssh_pass=''  # "sshpass" package is required for use "ansible_ssh_pass"
+ansible_ssh_private_key_file=~/.ssh/slave_dev_id_rsa
+ansible_python_interpreter='/usr/bin/python3'  # is required for use python3
+

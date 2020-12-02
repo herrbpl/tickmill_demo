@@ -1,0 +1,42 @@
+- name: create vg pgdata
+  lvg:
+    vg: pgdata
+    pvs: /dev/sdb
+  
+
+- name: create LVM data_postgresql
+  lvol:
+    vg: pgdata
+    lv: data_postgresql
+    size: 19G
+#    force: yes
+
+- name: Create fs 
+  filesystem:
+    fstype: ext4
+    dev: /dev/pgdata/data_postgresql
+
+- name: mount data_postgresql LVM
+  mount:
+    name: /var/lib/postgresql
+    src: /dev/pgdata/data_postgresql
+    fstype: ext4
+    state: mounted
+  
+- name: create LVM data_backup
+  lvol:
+    vg: pgdata
+    lv: data_backup
+    size: 10G
+
+- name: Create fs 
+  filesystem:
+    fstype: ext4
+    dev: /dev/pgdata/data_backup
+
+- name: mount data_postgresql LVM
+  mount:
+    name: /data/backup
+    src: /dev/pgdata/data_backup
+    fstype: ext4
+    state: mounted

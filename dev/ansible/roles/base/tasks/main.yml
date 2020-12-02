@@ -1,0 +1,12 @@
+- name: Install base dependencies
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - locales
+      - htop
+      - git
+      - mc
+    state: present
+  tags:
+    - packages

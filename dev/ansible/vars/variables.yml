@@ -1,0 +1,12 @@
+cluster_vip: "10.0.1.x"  # ip address for client access to databases in the cluster (optional)
+vip_interface: "{{ ansible_default_ipv4.interface }}"  # interface name (ex. "ens32")
+postgresql_port: "5432"
+patroni_01: "patroni-01=http://10.0.1.x:2380"
+patroni_02: "patroni-02=http://10.0.1.x:2380"
+patroni_03: "patroni-03=http://10.0.1.x:2380"
+#postgresql_version: "postgresql-10"
+etcd_host_1: "10.0.1.x2379"
+etcd_host_2: "10.0.1.x:2379"
+etcd_host_3: "10.0.1.x:2379"
+cluster_name: cluster
+postgresql_version: "10"

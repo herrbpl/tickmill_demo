@@ -1,0 +1,55 @@
+- name: install patroni
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - patroni
+    state: present
+
+#- name: Template a file for patroni.yml
+#  template:
+#    src: template/config.yml.j2
+#    dest: /etc/patroni/config.yml.in
+#    owner: root
+#    group: root
+#    mode: '0644'
+
+- name: Template a file for dcs.yml
+  template:
+    src: template/dcs.yml.j2
+    dest: /etc/patroni/dcs.yml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create patroni log directory if it does not exist
+  file:
+    path: /var/log/patroni
+    state: directory
+    mode: '0755'
+    owner: postgres
+    group: postgres
+    recurse: yes
+
+
+- name: systemctl disable patroni
+  systemd:
+    daemon_reload: yes
+    name: patroni
+    state: stopped
+    enabled: no
+
+- name: Create postgresql directory if it does not exist
+  file:
+    path: /var/lib/postgresql
+    state: directory
+    mode: '0755'
+    owner: postgres
+    group: postgres
+    recurse: yes
+    
+- name: remove lost and found folder
+  file:
+    path: /var/lib/postgresql/lost+found
+    state: absent
+

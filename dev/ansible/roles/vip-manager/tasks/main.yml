@@ -1,0 +1,27 @@
+- name: Install vip-manager
+  apt:
+    update_cache: yes
+    name: vip-manager
+    state: present
+
+
+- name: Create patroni configuration
+  command: pg_createconfig_patroni --vip={{ cluster_vip }} {{ postgresql_version }} {{ cluster_name }}
+  tags:
+    - config
+
+- name: systemctl daemon-reload / start patroni
+  systemd:
+    daemon_reload: yes
+    name: patroni@{{ postgresql_version }}-{{ cluster_name }}
+    state: restarted
+    enabled: yes
+  tags:
+    - config
+
+- name: systemctl daemon-reload / start vip-manager
+  systemd:
+    daemon_reload: yes
+    name: vip-manager@{{ postgresql_version }}-{{ cluster_name }}
+    state: restarted
+    enabled: yes

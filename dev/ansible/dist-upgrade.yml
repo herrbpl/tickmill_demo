@@ -1,0 +1,16 @@
+- hosts: all
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Update packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+        autoremove: yes
+      register: output
+    - name: Remove unused dependency packages
+      apt:
+        autoremove: yes
+    - name: Check if a reboot is needed on all servers
+      register: reboot_required_file
+      stat: path=/var/run/reboot-required get_md5=no  

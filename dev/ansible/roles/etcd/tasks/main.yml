@@ -1,0 +1,47 @@
+- name: etcd
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - etcd
+    state: present
+  tags:
+    - packages
+- name: Create etcd directory if it does not exist
+  file:
+    path: /etc/etcd
+    state: directory
+    mode: '0755'
+
+- name: Template a service file for etcd
+  template:
+    src: template/etcd.service
+    dest: /lib/systemd/system/etcd.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Template a config file for etcd
+  template:
+    src: template/etcd.conf
+    dest: /etc/etcd/etcd.conf
+    owner: etcd
+    group: etcd
+    mode: '0644'
+- name: remove etcd default folder
+  file:
+    path: /var/lib/etcd/default
+    state: absent
+
+- name: reload new service files
+  systemd: daemon_reload=yes
+
+- name: restart service etcd
+  service:
+    name: etcd
+    state: restarted
+
+- name: Enable service etcd
+  service:
+    name: etcd
+    enabled: yes  
